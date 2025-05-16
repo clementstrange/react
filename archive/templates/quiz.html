@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Question {{ session['current_question'] + 1 }}</h1>
+<form method="POST" action="{{ url_for('quiz') }}">
+    <h2>{{ question.question }}</h2>
+    <div class="options">
+        {% for option in question.options %}
+        <label class="option">
+            <input type="radio" name="answer" value="{{ option }}" required>
+            {{ option }}
+        </label>
+        {% endfor %}
+    </div>
+    <button type="submit" class="btn">Submit Answer</button>
+</form>
+{% endblock %} 

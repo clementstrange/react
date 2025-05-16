@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Pokemon Battle!</h1>
+<p>Welcome to the Pokemon Battle Arena! You are controlling Latias against Charmander.</p>
+<p>Each turn, you'll be given two random attacks to choose from. Choose wisely!</p>
+<a href="{{ url_for('battle') }}" class="btn">Start Battle</a>
+{% endblock %} 
