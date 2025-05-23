@@ -116,3 +116,18 @@ button:hover {
     width: auto;
   }
 }
+
+.ai-toggle {
+  margin-top: 1rem;
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.ai-toggle:hover {
+  background: var(--primary-hover);
+}

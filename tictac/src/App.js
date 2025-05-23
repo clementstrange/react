@@ -2,29 +2,75 @@
 // [x] Rewrite Board to use two loops to make the squares instead of hardcoding them.
 // [x] When someone wins, highlight the three squares that caused the win (and when no one wins, display a message about the result being a draw).
 
-import {useState} from 'react';
-
+import {useState,useEffect} from 'react';
 function Square ({value, onSquareClick, isWinning}) {
   return <button className={`square ${isWinning ? 'winning': ''}`}
   onClick = {onSquareClick}>{value}</button>
 }
 
 export default function Game() {
+  // Add new state
+  const [isAIThinking, setIsAIThinking] = useState(false);
+  
   const [xIsNext, setXIsNext] = useState(true);
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [currentMove,setCurrentMove] = useState(0);
+  const [isAIOpponent,setIsAIOpponent] = useState(true)
   const currentSquares = history[currentMove];
   
+  function makeAIMove(squares) {
+    const availableMoves = squares
+      .map((square,index) => (square === null ? index:null))
+      .filter(move => move !== null);
+    const randomMove = availableMoves[Math.floor(Math.random()*availableMoves.length)];
+    const nextSquares = squares.slice()
+    nextSquares[randomMove] = "O";
+    return nextSquares;
+  }
+
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove +1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length-1)
     setXIsNext(!xIsNext);
+    if (isAIOpponent && !xIsNext && !calculateWinner(nextSquares)) {
+      setTimeout(() => {
+        const aiSquares = makeAIMove(nextSquares);
+        const aiHistory = [...nextHistory,aiSquares];
+        setHistory(aiHistory);
+        setCurrentMove(aiHistory.length - 1);
+        setXIsNext(true);
+      },500);
+    }
   } 
-  
+  // Update useEffect for AI's first move
+  useEffect(() => {
+    if (isAIOpponent && !xIsNext && currentMove === 0 && !isAIThinking) {
+      setIsAIThinking(true);
+      const aiSquares = makeAIMove(currentSquares);
+      const nextHistory = [...history, aiSquares];
+      setHistory(nextHistory);
+      setCurrentMove(1);
+      setXIsNext(true);
+      setIsAIThinking(false);
+    }
+  }, [isAIOpponent, xIsNext, currentMove, currentSquares, history, isAIThinking]); // Added dependencies
+
   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
-    setXIsNext(nextMove % 2 === 0);
+    const isXNext = nextMove % 2 === 0;
+    setXIsNext(isXNext);
+    
+    // Make AI move if jumping to a position where it's O's turn
+    if (isAIOpponent && !isXNext) {
+      setTimeout(() => {
+        const aiSquares = makeAIMove(history[nextMove]);
+        const nextHistory = [...history.slice(0, nextMove + 1), aiSquares];
+        setHistory(nextHistory);
+        setCurrentMove(nextMove + 1);
+        setXIsNext(true);
+      }, 500);
+    }
   }
   const moves = history.map((squares,move) => {
     let description;
@@ -49,6 +95,11 @@ export default function Game() {
     <div className = "game">
       <div className = "game-board">
         <Board xIsNext = {xIsNext} squares={currentSquares} onPlay={handlePlay} />
+        <button className="ai-toggle"
+        onClick = {()=>setIsAIOpponent(!isAIOpponent)}
+        >
+          {isAIOpponent ? 'Play vs Human' : 'Play vs AI'}
+        </button>
       </div>
       <div className="game-info">
         <ol>{moves}</ol>
