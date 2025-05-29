@@ -8,6 +8,13 @@ body {
   padding: 20px;
 }
 
+.due-date {
+  font-size: 0.8em;
+  color: #666;
+  margin-left: 1rem;
+  font-weight: normal;
+}
+
 .app-container {
   max-width: 800px;
   margin: 0 auto;

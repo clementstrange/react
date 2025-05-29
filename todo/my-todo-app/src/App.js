@@ -17,6 +17,7 @@ const ViewItems = ({ todoId, itemData, markDone, deleteItem }) => {
       />
       <h2 className={`todo-text ${itemData.completed ? 'completed' : ''} ${getPriorityClass(itemData.priority)}`}>
         {itemData.name} : {itemData.priority.toUpperCase()}
+        {itemData.due && <span className='due-date'> Due: {itemData.due}</span>}
       </h2>
       <button className="delete-button" onClick={() => deleteItem(todoId)}>
         DELETE
@@ -29,6 +30,7 @@ const ViewItems = ({ todoId, itemData, markDone, deleteItem }) => {
 const NewItem = ({ addTodo }) => {
   const [name, setName] = useState("");
   const [priority, setPriority] = useState("low");
+  const [due, setDue] = useState("");
 
   return (
     <div className="add-todo-section">
@@ -36,18 +38,24 @@ const NewItem = ({ addTodo }) => {
         className="todo-input"
         value={name} 
         onChange={(e) => setName(e.target.value)} 
-        placeholder="Enter mission objective..."
+        placeholder="Enter mission name"
       />
       <select className="priority-select" value={priority} onChange={(e) => setPriority(e.target.value)}>
         <option value="low">LOW PRIORITY</option>
         <option value="mid">MID PRIORITY</option>
         <option value="high">HIGH PRIORITY</option>
       </select>
+      <input 
+        className = "todo-input" 
+        value = {due} 
+        onChange={(e) => setDue(e.target.value)}
+        placeholder="Enter due date"/>
       <button className="add-button" onClick={() => {
         if (name.trim()) {
-          addTodo(name, priority);
+          addTodo(name, priority,due);
           setName("");
           setPriority("low");
+          setDue("")
         }
       }}>
         ADD MISSION
@@ -60,8 +68,7 @@ const NewItem = ({ addTodo }) => {
 const App = () => {
   const [todos, setTodos] = useState({});
 
-  const addTodo = (name, priority) => {
-    // Fill in your addTodo logic here
+  const addTodo = (name, priority, due) => {  // Add due parameter
     const id = `${Math.floor(Math.random() * 1000)}_${Date.now()}`;
     const dateAdded = new Date().toISOString().split('T')[0];
     const completed = false;
@@ -70,6 +77,7 @@ const App = () => {
       name,
       dateAdded,
       priority,
+      due,        // Now 'due' is defined
       completed
     };
     
